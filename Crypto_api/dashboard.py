@@ -26,18 +26,44 @@ choosen_coins= col1.multiselect(
                              )
 price_per= col2.selectbox( label= 'Prices per:', options= ['Day', 'Hour', 'Minute'])
 
-crypto_list = cc.get_historical_price_minute(
-                                            'BTC',
-                                            limit=300,
-                                            exchange='CCCAGG',
-                                            toTs=datetime.datetime.now(),           
-                                          )
+crypto_list= []
 
-crypto_prices_df = pd.DataFrame(crypto_list, columns=['time', 'open', 'close', 'volumeto'])
-crypto_prices_df['time']= pd.to_datetime(crypto_prices_df['time'], unit='s')
-st.write(crypto_list)
+if price_per== 'Day':
+    for coin in choosen_coins:
+        crypto_list.append(cc.get_historical_price_day(
+                                                coin,
+                                                limit=300,
+                                                exchange='CCCAGG',
+                                                toTs=datetime.datetime.now(),           
+                                              ))
+elif price_per== 'Hour':
+    for coin in choosen_coins:
+        crypto_list.append(cc.get_historical_price_hour(
+                                                  coin,
+                                                  limit=300,
+                                                  exchange='CCCAGG',
+                                                  toTs=datetime.datetime.now(),           
+                                                ))
+else:
+    for coin in choosen_coins:
+        crypto_list.append(cc.get_historical_price_minute(
+                                                  coin,
+                                                  limit=300,
+                                                  exchange='CCCAGG',
+                                                  toTs=datetime.datetime.now(),           
+                                                ))
+
+dataframes_ls= []
+for item, coin in zip(crypto_list, choosen_coins):
+    coin_df = pd.DataFrame(item, columns=['time', 'open', 'close', 'volumeto'])
+    coin_df['time']= pd.to_datetime(coin_df['time'], unit='s')
+    coin_df['coin']= coin
+    dataframes_ls.append(coin_df)
+
+crypto_prices_df= pd.concat(dataframes_ls)
 
 chart_ = chart.get_chart(crypto_prices_df)
+
 st.altair_chart(chart_, use_container_width=True)
 
 
