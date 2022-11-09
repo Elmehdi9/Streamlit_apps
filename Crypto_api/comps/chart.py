@@ -16,6 +16,8 @@ def get_chart(data):
         .encode(
             x="time",
             y="open",
+            color="coin",
+            strokeDash="coin",
         )
     )
 
