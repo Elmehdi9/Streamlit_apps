@@ -18,12 +18,22 @@ for coin in cc.get_coin_list(format=False):
     coins.append(coin)
 coins_df= pd.DataFrame.from_dict(coins)
 
+# To get the dataframe 
+crypto= cc.get_coin_list(format=False)
+crypto_df= pd.DataFrame.from_dict(crypto, orient= 'index')
+
 col1, col2= st.columns(2)
 choosen_coins= col1.multiselect(
                                 label= 'Coins to visualize',
                                 options= coins,
-                                default= coins[:3],
+                                default= coins[:1],
                              )
+
+# To display coin's image and description
+st.write(crypto_df.loc[crypto_df['Symbol']== choosen_coins[0]].Description.iloc[0])
+img_link= crypto_df.loc[crypto_df['Symbol']== choosen_coins[0]].ImageUrl.iloc[0]
+st.image('https://www.cryptocompare.com/{}'.format(img_link))
+
 price_per= col2.selectbox( label= 'Prices per:', options= ['Day', 'Hour', 'Minute'])
 
 crypto_list= []
@@ -61,15 +71,12 @@ for item, coin in zip(crypto_list, choosen_coins):
     dataframes_ls.append(coin_df)
 
 crypto_prices_df= pd.concat(dataframes_ls)
-
 chart_ = chart.get_chart(crypto_prices_df)
-
 st.altair_chart(chart_, use_container_width=True)
 
-
-
-
-
+crypto= cc.get_coin_list(format=False)
+crypto_df= pd.DataFrame.from_dict(crypto, orient= 'index')
+st.write(crypto_df)
 
 
 
